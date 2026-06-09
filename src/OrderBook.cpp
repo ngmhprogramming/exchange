@@ -1,4 +1,7 @@
 #include <exchange/OrderBook.hpp>
+#include <iomanip>
+#include <iostream>
+#include <ranges>
 
 namespace exchange {
 
@@ -51,6 +54,41 @@ void OrderBook::addOrder(const Order &order) {
             std::cout << "Added ask " << current_order << "\n";
         }
     }
+}
+
+std::ostream &operator<<(std::ostream &os, const OrderBook &book) {
+    const std::string GREEN = "\033[32m";
+    const std::string RED = "\033[31m";
+    const std::string RESET = "\033[0m";
+
+    os << std::right << std::setw(10) << "Bid"
+       << " | " << std::setw(8) << "Price"
+       << " | " << std::left << std::setw(10) << "Ask"
+       << "\n";
+    os << "-----------------------------------\n";
+    for (const auto &[price, orders] : book.asks | std::views::reverse) {
+        uint32_t volume = 0;
+        for (const auto &order : orders) {
+            volume += order.quantity;
+        }
+        os << std::right << GREEN << std::setw(10) << "" << RESET << " | ";
+        os << std::fixed << std::setprecision(2) << std::setw(8) << price
+           << " | ";
+        os << std::left << RED << std::setw(10)
+           << (volume > 0 ? std::to_string(volume) : "") << RESET << "\n";
+    }
+    for (const auto &[price, orders] : book.bids) {
+        uint32_t volume = 0;
+        for (const auto &order : orders) {
+            volume += order.quantity;
+        }
+        os << std::right << GREEN << std::setw(10)
+           << (volume > 0 ? std::to_string(volume) : "") << RESET << " | ";
+        os << std::fixed << std::setprecision(2) << std::setw(8) << price
+           << " | ";
+        os << std::left << RED << std::setw(10) << "" << RESET << "\n";
+    }
+    return os;
 }
 
 } // namespace exchange

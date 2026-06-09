@@ -9,6 +9,7 @@ namespace exchange {
 class OrderBook {
   public:
     void addOrder(const Order &order);
+    friend std::ostream &operator<<(std::ostream &os, const OrderBook &book);
 
   private:
     // Map Price -> Orders
