@@ -10,4 +10,19 @@ int main() {
     std::cout << "Order with ID " << order.id << " initialised\n";
 
     std::cout << "Order created: " << order << "\n";
+
+    exchange::OrderBook book;
+
+    exchange::Order ask1{1, 1001, 150.00, 100, exchange::Side::Sell};
+    book.addOrder(ask1);
+    exchange::Order buy1{2, 1002, 150.00, 100, exchange::Side::Buy};
+    book.addOrder(buy1); // Execute a trade for 100
+
+    exchange::Order ask2{3, 1003, 200.00, 100, exchange::Side::Sell};
+    book.addOrder(ask2);
+    exchange::Order buy2{4, 1004, 200.00, 40, exchange::Side::Buy};
+    book.addOrder(buy2); // Execute a trade for 40, leaving 60
+
+    exchange::Order buy3{5, 1005, 190.00, 50, exchange::Side::Buy};
+    book.addOrder(buy3); // No trade should be executed
 }

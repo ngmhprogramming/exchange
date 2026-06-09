@@ -6,6 +6,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(include)
 
-add_executable(engine src/main.cpp)
+add_executable(engine
+	src/main.cpp
+	src/OrderBook.cpp
+)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
