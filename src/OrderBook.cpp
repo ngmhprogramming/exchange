@@ -2,11 +2,13 @@
 #include <iomanip>
 #include <iostream>
 #include <ranges>
+#include <vector>
 
 namespace exchange {
 
-void OrderBook::addOrder(const Order &order) {
+void OrderBook::addOrder(const Order &order, std::vector<TradeReport> &res) {
     Order current_order = order;
+    res.clear();
     if (order.side == Side::Buy) {
         // Matching logic
         while (!asks.empty() && current_order.quantity > 0 &&
@@ -17,6 +19,8 @@ void OrderBook::addOrder(const Order &order) {
                 std::min(current_order.quantity, best_ask.quantity);
             std::cout << "Executing trade " << filled_quantity << " @ "
                       << best_ask.price << "\n";
+            res.emplace_back(best_ask.id, current_order.id, 0, best_ask.price,
+                             filled_quantity);
             current_order.quantity -= filled_quantity;
             best_ask.quantity -= filled_quantity;
             if (best_ask.quantity == 0) {
@@ -40,6 +44,8 @@ void OrderBook::addOrder(const Order &order) {
                 std::min(current_order.quantity, best_bid.quantity);
             std::cout << "Executing trade " << filled_quantity << " @ "
                       << best_bid.price << "\n";
+            res.emplace_back(best_bid.id, current_order.id, 0, best_bid.price,
+                             filled_quantity);
             current_order.quantity -= filled_quantity;
             best_bid.quantity -= filled_quantity;
             if (best_bid.quantity == 0) {

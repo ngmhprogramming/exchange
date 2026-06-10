@@ -1,14 +1,16 @@
 #pragma once
 #include <deque>
 #include <exchange/common/Order.hpp>
+#include <exchange/common/TradeReport.hpp>
 #include <iostream>
 #include <map>
+#include <vector>
 
 namespace exchange {
 
 class OrderBook {
   public:
-    void addOrder(const Order &order);
+    void addOrder(const Order &order, std::vector<TradeReport> &res);
     friend std::ostream &operator<<(std::ostream &os, const OrderBook &book);
 
   private:
