@@ -10,6 +10,8 @@ namespace exchange {
 
 class OrderBook {
   public:
+    void matchOrder(Order &current_order, auto &other_side, auto can_match,
+                    std::vector<TradeReport> &res);
     void addOrder(const Order &order, std::vector<TradeReport> &res);
     friend std::ostream &operator<<(std::ostream &os, const OrderBook &book);
 

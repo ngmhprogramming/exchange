@@ -6,55 +6,47 @@
 
 namespace exchange {
 
+void OrderBook::matchOrder(Order &current_order, auto &other_side,
+                           auto can_match, std::vector<TradeReport> &res) {
+    while (!other_side.empty() && current_order.quantity > 0) {
+        // Check if we can fill the order
+        const auto &best_price = other_side.begin()->first;
+        auto &best_level = other_side.begin()->second;
+        if (!can_match(current_order.price, best_price)) {
+            break;
+        }
+
+        // Fill the order and report
+        auto &best_order = best_level.front();
+        uint32_t filled_quantity =
+            std::min(current_order.quantity, best_order.quantity);
+        res.emplace_back(best_order.id, current_order.id,
+                         current_order.timestamp, best_order.price,
+                         filled_quantity);
+        current_order.quantity -= filled_quantity;
+        best_order.quantity -= filled_quantity;
+
+        // Update order book
+        if (best_order.quantity == 0) {
+            best_level.pop_front();
+        }
+        if (best_level.empty()) {
+            other_side.erase(other_side.begin());
+        }
+    }
+}
+
 void OrderBook::addOrder(const Order &order, std::vector<TradeReport> &res) {
     Order current_order = order;
     res.clear();
     if (order.side == Side::Buy) {
-        // Matching logic
-        while (!asks.empty() && current_order.quantity > 0 &&
-               current_order.price >= asks.begin()->first) {
-            auto &best_asks = asks.begin()->second;
-            auto &best_ask = best_asks.front();
-            uint32_t filled_quantity =
-                std::min(current_order.quantity, best_ask.quantity);
-            std::cout << "Executing trade " << filled_quantity << " @ "
-                      << best_ask.price << "\n";
-            res.emplace_back(best_ask.id, current_order.id, 0, best_ask.price,
-                             filled_quantity);
-            current_order.quantity -= filled_quantity;
-            best_ask.quantity -= filled_quantity;
-            if (best_ask.quantity == 0) {
-                best_asks.pop_front();
-            }
-            if (best_asks.empty()) {
-                asks.erase(asks.begin());
-            }
-        }
+        matchOrder(current_order, asks, std::greater_equal<double>{}, res);
         if (current_order.quantity > 0) {
             bids[order.price].push_back(current_order);
             std::cout << "Added bid " << current_order << "\n";
         }
     } else {
-        // Matching logic
-        while (!bids.empty() && current_order.quantity > 0 &&
-               current_order.price <= bids.begin()->first) {
-            auto &best_bids = bids.begin()->second;
-            auto &best_bid = best_bids.front();
-            uint32_t filled_quantity =
-                std::min(current_order.quantity, best_bid.quantity);
-            std::cout << "Executing trade " << filled_quantity << " @ "
-                      << best_bid.price << "\n";
-            res.emplace_back(best_bid.id, current_order.id, 0, best_bid.price,
-                             filled_quantity);
-            current_order.quantity -= filled_quantity;
-            best_bid.quantity -= filled_quantity;
-            if (best_bid.quantity == 0) {
-                best_bids.pop_front();
-            }
-            if (best_bids.empty()) {
-                bids.erase(bids.begin());
-            }
-        }
+        matchOrder(current_order, asks, std::less_equal<double>{}, res);
         if (current_order.quantity > 0) {
             asks[order.price].push_back(current_order);
             std::cout << "Added ask " << current_order << "\n";
