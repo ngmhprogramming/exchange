@@ -13,11 +13,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Configure CMake
-      run: cmake -S . -B build
+    - name: Configure cmake
+      run: cmake -S . -B build -DENABLE_SANITIZER_ADDRESS=ON -DENABLE_SANITIZER_UNDEFINED=ON
 
     - name: Build
       run: cmake --build build
 
-    - name: Run Engine
+    - name: Run Engine Sanity Check
       run: ./build/engine
+
+    - name: Run Unit Tests with Sanitizers
+      run: ./build/tests/engine_tests

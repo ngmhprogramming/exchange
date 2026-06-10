@@ -67,3 +67,14 @@ TEST(OrderBookTests, MassLiquidityGeneration) {
         EXPECT_TRUE(res.empty());
     }
 }
+
+TEST(SanitizerVerification, TriggerASan) {
+    int volatile *array = new int[10];
+    array[0] = 42;
+
+    // Intentionally reading out-of-bounds (index 15 on an array of size 10)
+    int volatile leak = array[15];
+    (void)leak;
+
+    delete[] array;
+}
