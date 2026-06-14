@@ -6,9 +6,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Sanitizers
+option(BUILD_TESTING_SUITE "Build the engine unit test suite" OFF)
 option(ENABLE_SANITIZER_ADDRESS "Enable AddressSanitizer" OFF)
 option(ENABLE_SANITIZER_UNDEFINED "Enable UndefinedBehaviorSanitizer" OFF)
 option(ENABLE_SANITIZER_THREAD "Enable ThreadSanitizer" OFF)
+
+if(ENABLE_SANITIZER_THREAD)
+    set(ENABLE_SANITIZER_ADDRESS OFF CACHE BOOL "Force ASan OFF for ThreadSanitizer" FORCE)
+    set(ENABLE_SANITIZER_UNDEFINED OFF CACHE BOOL "Force UBSan OFF for ThreadSanitizer" FORCE)
+elseif(ENABLE_SANITIZER_ADDRESS OR ENABLE_SANITIZER_UNDEFINED)
+    set(ENABLE_SANITIZER_THREAD OFF CACHE BOOL "Force TSan OFF for AddressSanitizer" FORCE)
+endif()
 
 function(apply_sanitizers TARGET_NAME)
     if(ENABLE_SANITIZER_ADDRESS)
@@ -39,8 +47,10 @@ add_executable(engine
 
 target_link_libraries(engine PRIVATE exchange_lib)
 
-enable_testing()
-add_subdirectory(tests)
+if(BUILD_TESTING_SUITE)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
 
 apply_sanitizers(exchange_lib)
 apply_sanitizers(engine)

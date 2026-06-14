@@ -1,8 +1,16 @@
 # exchange
 An exchange engine built in C++.
 
-## Build Instructions
+## Make Quickstart
 This project uses CMake.
+
+- `make run`: run the main engine
+- `make test`: run test suite
+- `make test-asan`: run test suite with ASan and UBSan
+- `make test-tsan`: run test suite with TSan
+- `make clean`: clean build cache
+
+## Manual Build
 
 ### Running the Engine
 
