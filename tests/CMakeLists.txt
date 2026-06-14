@@ -9,7 +9,12 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-add_executable(engine_tests test_main.cpp test_order_book.cpp)
+add_executable(engine_tests
+    test_main.cpp
+    test_order_matching.cpp
+    test_order_cancelling.cpp
+    test_exchange_misc.cpp
+)
 target_link_libraries(engine_tests PRIVATE exchange_lib gtest)
 add_test(NAME EngineUnitTests COMMAND engine_tests)
 apply_sanitizers(engine_tests)
