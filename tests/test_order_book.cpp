@@ -6,8 +6,8 @@ TEST(OrderBookTests, ExactPriceMatch) {
     exchange::OrderBook book;
     std::vector<exchange::TradeReport> res;
 
-    exchange::Order ask1{1, 1001, 150.00, 100, exchange::Side::Sell};
-    exchange::Order buy1{2, 1002, 150.00, 100, exchange::Side::Buy};
+    exchange::Order ask1{1, 1001, 1500000, 100, exchange::Side::Sell};
+    exchange::Order buy1{2, 1002, 1500000, 100, exchange::Side::Buy};
 
     book.addOrder(ask1, res);
     EXPECT_TRUE(res.empty()); // No trade should occur
@@ -15,7 +15,7 @@ TEST(OrderBookTests, ExactPriceMatch) {
     book.addOrder(buy1, res); // Trade should be executed
     ASSERT_EQ(res.size(), 1);
     EXPECT_EQ(res[0].quantity, 100);
-    EXPECT_DOUBLE_EQ(res[0].price, 150.00);
+    EXPECT_DOUBLE_EQ(res[0].price, 1500000);
     EXPECT_EQ(res[0].maker_id, 1);
     EXPECT_EQ(res[0].taker_id, 2);
 }
@@ -24,8 +24,8 @@ TEST(OrderBookTests, PartialFillLeavesRemainder) {
     exchange::OrderBook book;
     std::vector<exchange::TradeReport> res;
 
-    exchange::Order ask2{3, 1003, 200.00, 100, exchange::Side::Sell};
-    exchange::Order buy2{4, 1004, 200.00, 40, exchange::Side::Buy};
+    exchange::Order ask2{3, 1003, 2000000, 100, exchange::Side::Sell};
+    exchange::Order buy2{4, 1004, 2000000, 40, exchange::Side::Buy};
 
     book.addOrder(ask2, res);
     book.addOrder(buy2, res);
@@ -33,7 +33,7 @@ TEST(OrderBookTests, PartialFillLeavesRemainder) {
     // Trade should partially fill existing order
     ASSERT_EQ(res.size(), 1);
     EXPECT_EQ(res[0].quantity, 40);
-    EXPECT_DOUBLE_EQ(res[0].price, 200.00);
+    EXPECT_DOUBLE_EQ(res[0].price, 2000000);
     EXPECT_EQ(res[0].maker_id, 3);
     EXPECT_EQ(res[0].taker_id, 4);
 }
@@ -42,8 +42,8 @@ TEST(OrderBookTests, NonCrossingOrdersRestPassively) {
     exchange::OrderBook book;
     std::vector<exchange::TradeReport> res;
 
-    exchange::Order buy3{5, 1005, 190.00, 50, exchange::Side::Buy};
-    exchange::Order sell3{5, 1005, 200.00, 50, exchange::Side::Buy};
+    exchange::Order buy3{5, 1005, 1900000, 50, exchange::Side::Buy};
+    exchange::Order sell3{5, 1005, 2000000, 50, exchange::Side::Buy};
 
     book.addOrder(buy3, res);
     book.addOrder(sell3, res);
@@ -55,7 +55,7 @@ TEST(OrderBookTests, MassLiquidityGeneration) {
     std::vector<exchange::TradeReport> res;
 
     for (int i = 0; i < 50; i++) {
-        double price = i;
+        uint64_t price = i;
         uint32_t qty = i * 100;
         exchange::Side side =
             (i <= 25) ? exchange::Side::Buy : exchange::Side::Sell;

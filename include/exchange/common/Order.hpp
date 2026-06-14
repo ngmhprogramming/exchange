@@ -9,7 +9,7 @@ enum class Side : uint8_t { Buy, Sell };
 struct Order {
     uint64_t id;
     uint64_t timestamp;
-    double price;
+    uint64_t price; // multiplier of 10000
     uint32_t quantity;
     Side side;
 

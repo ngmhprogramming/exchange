@@ -6,7 +6,7 @@ int main() {
     exchange::OrderBook ladder_book;
     std::vector<exchange::TradeReport> res;
     for (int i = 0; i < 50; i++) {
-        double price = i;
+        uint64_t price = i;
         uint32_t qty = i * 100;
         exchange::Side side =
             i <= 25 ? exchange::Side::Buy : exchange::Side::Sell;
