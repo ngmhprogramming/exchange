@@ -14,6 +14,7 @@ add_executable(engine_tests
     test_order_matching.cpp
     test_order_cancelling.cpp
     test_exchange_misc.cpp
+    test_binary_feed.cpp
 )
 target_link_libraries(engine_tests PRIVATE exchange_lib gtest)
 add_test(NAME EngineUnitTests COMMAND engine_tests)

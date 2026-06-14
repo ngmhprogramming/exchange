@@ -34,6 +34,14 @@ A large order sequentially sweeps multiple price levels.
 
 ### 2.5 Cancel Post-Full Fill
 
-## 3: Miscellaneous
+## 3: Order Book Miscellaneous
 
 ### 3.1 Ladder View Output
+
+## 4: Input Feed
+
+### 4.1 Process Crossing Stream
+
+### 4.2 Process Cancellation Stream
+
+### 4.3 Process File Input Crossing Stream

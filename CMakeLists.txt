@@ -39,6 +39,7 @@ include_directories(include)
 
 add_library(exchange_lib STATIC
     src/OrderBook.cpp
+    src/BinaryInputFeed.cpp
 )
 
 add_executable(engine
