@@ -28,6 +28,7 @@ void OrderBook::matchOrder(Order &current_order, auto &other_side,
 
         // Update order book
         if (best_order.quantity == 0) {
+            order_map.erase(best_order.id);
             best_level.pop_front();
         }
         if (best_level.empty()) {
@@ -40,18 +41,45 @@ void OrderBook::addOrder(const Order &order, std::vector<TradeReport> &res) {
     Order current_order = order;
     res.clear();
     if (order.side == Side::Buy) {
-        matchOrder(current_order, asks, std::greater_equal<double>{}, res);
+        matchOrder(current_order, asks, std::greater_equal<uint64_t>{}, res);
         if (current_order.quantity > 0) {
             bids[order.price].push_back(current_order);
+            order_map[order.id] = std::prev(bids[order.price].end());
             std::cout << "Added bid " << current_order << "\n";
         }
     } else {
-        matchOrder(current_order, asks, std::less_equal<double>{}, res);
+        matchOrder(current_order, bids, std::less_equal<uint64_t>{}, res);
         if (current_order.quantity > 0) {
             asks[order.price].push_back(current_order);
+            order_map[order.id] = std::prev(asks[order.price].end());
             std::cout << "Added ask " << current_order << "\n";
         }
     }
+}
+
+bool OrderBook::cancelOrder(uint64_t order_id) {
+    auto map_it = order_map.find(order_id);
+    if (map_it == order_map.end()) {
+        return false;
+    }
+    auto list_it = map_it->second;
+    uint64_t price = list_it->price;
+    Side side = list_it->side;
+    if (side == Side::Buy) {
+        auto level_it = bids.find(price);
+        level_it->second.erase(list_it);
+        if (level_it->second.empty()) {
+            bids.erase(level_it);
+        }
+    } else {
+        auto level_it = asks.find(price);
+        level_it->second.erase(list_it);
+        if (level_it->second.empty()) {
+            asks.erase(level_it);
+        }
+    }
+    order_map.erase(map_it);
+    return true;
 }
 
 std::ostream &operator<<(std::ostream &os, const OrderBook &book) {
@@ -70,8 +98,8 @@ std::ostream &operator<<(std::ostream &os, const OrderBook &book) {
             volume += order.quantity;
         }
         os << std::right << GREEN << std::setw(10) << "" << RESET << " | ";
-        os << std::fixed << std::setprecision(2) << std::setw(8) << price
-           << " | ";
+        os << std::fixed << std::setprecision(2) << std::setw(8)
+           << (static_cast<double>(price) / 10000.0) << " | ";
         os << std::left << RED << std::setw(10)
            << (volume > 0 ? std::to_string(volume) : "") << RESET << "\n";
     }
@@ -82,8 +110,8 @@ std::ostream &operator<<(std::ostream &os, const OrderBook &book) {
         }
         os << std::right << GREEN << std::setw(10)
            << (volume > 0 ? std::to_string(volume) : "") << RESET << " | ";
-        os << std::fixed << std::setprecision(2) << std::setw(8) << price
-           << " | ";
+        os << std::fixed << std::setprecision(2) << std::setw(8)
+           << (static_cast<double>(price) / 10000.0) << " | ";
         os << std::left << RED << std::setw(10) << "" << RESET << "\n";
     }
     return os;
