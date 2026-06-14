@@ -1,4 +1,4 @@
-name: CMake
+name: CMake CI/CD
 
 on:
   push:
@@ -7,20 +7,30 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
-    - name: Configure cmake
-      run: cmake -S . -B build -DENABLE_SANITIZER_ADDRESS=ON -DENABLE_SANITIZER_UNDEFINED=ON
-
-    - name: Build
-      run: cmake --build build
+    - name: Clean Build Cache
+      run: make clean
 
     - name: Run Engine Sanity Check
-      run: ./build/engine
+      run: make run
 
-    - name: Run Unit Tests with Sanitizers
-      run: ./build/tests/engine_tests
+    - name: Run Standard Unit Tests
+      run: |
+        make clean
+        make test
+
+    - name: Test with ASan and UBSan
+      run: |
+        make clean
+        make test-asan
+
+    - name: Test with TSan
+      run: |
+        make clean
+        make test-tsan
