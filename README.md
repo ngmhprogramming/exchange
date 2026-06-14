@@ -5,6 +5,7 @@ An exchange engine built in C++.
 This project uses CMake.
 
 - `make run`: run the main engine
+- `make generate`: generate sample binary input file
 - `make test`: run test suite
 - `make test-asan`: run test suite with ASan and UBSan
 - `make test-tsan`: run test suite with TSan

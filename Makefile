@@ -1,10 +1,16 @@
-.PHONY: run test test-asan test-tsan clean
+.PHONY: run generate test test-asan test-tsan clean
 
 run:
 	@mkdir -p build
 	@cmake -S . -B build -DBUILD_TESTING_SUITE=OFF
 	@cmake --build build --target engine
 	@./build/engine
+
+generate:
+	@mkdir -p build
+	@cmake -S . -B build -DBUILD_TESTING_SUITE=OFF
+	@cmake --build build --target data_generator
+	@./build/data_generator
 
 test:
 	@mkdir -p build

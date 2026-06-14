@@ -55,3 +55,6 @@ endif()
 
 apply_sanitizers(exchange_lib)
 apply_sanitizers(engine)
+
+add_executable(data_generator src/generator.cpp)
+target_link_libraries(data_generator PRIVATE exchange_lib)
